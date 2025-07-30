@@ -18,4 +18,7 @@ class TaxiBillingSpec extends munit.FunSuite with TaxiBilling {
     assertEquals(calc(4D,"23:00"), 16.0D)
   }
 
+  test("23:00之后到第二天5点之前，起步距离以外每公里额外收取 1 元夜间行驶费") {
+    assertEquals(calc(0.5D,"23:00"), 13.0D)
+  }
 }
