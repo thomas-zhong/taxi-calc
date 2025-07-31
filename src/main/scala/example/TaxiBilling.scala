@@ -16,19 +16,26 @@ trait TaxiBilling {
   val NIGHT_START = LocalTime.of(23, 0)
   // 夜间区间终点
   val NIGHT_END = LocalTime.of(5, 0)
+  val LONG_DISTANCE_RATE = 2
 
   // distance 距离，Double 是双精度的浮点数，language 语言, postfix 后缀, Ops 操作符, Billing 计费, package 包， trait 特性
   def calc(distance: Double, startTime: String = "22:00"): Double = {
     if (distance <= BASE_DISTANCE) BASE_FARE
     else {
-      val overRage = Math.ceil(distance - BASE_DISTANCE)
-      val startLocalTime = LocalTime.parse(startTime)
-      if (isNightRate(startLocalTime)) {
-        BASE_FARE + overRage * (OVERAGE_RATE + OVERNIGHT_SURCHARGE)
-      } else {
-        BASE_FARE + overRage * OVERAGE_RATE
-      }
+      val overage = Math.ceil(distance - BASE_DISTANCE)
+      val overageRate: Double = calculateOverageRate(distance, startTime)
+      BASE_FARE + overage * overageRate
     }
+  }
+
+  private def calculateOverageRate(distance: Double, startTime: String) = {
+    val startLocalTime = LocalTime.parse(startTime)
+    val distanceRateFactor = if (distance >= 20.0D) LONG_DISTANCE_RATE else 1
+    if (isNightRate(startLocalTime)) {
+      OVERAGE_RATE + OVERNIGHT_SURCHARGE
+    } else {
+      OVERAGE_RATE
+    } * distanceRateFactor
   }
 
   //camel case
